@@ -160,6 +160,57 @@ export interface VendorChat {
 }
 
 export type UserRole = 'Travel Agent' | 'Fleet Owner / Operator' | 'Independent Driver' | 'Super Admin';
+export type AppRole = 'admin' | 'vendor';
+export type VerificationStatus = 'pending' | 'approved' | 'rejected';
+export type VendorAccountStatus = 'pending' | 'approved' | 'suspended';
+
+export interface Cab {
+  id: string;
+  vendorId: string;
+  vendorName?: string;
+  vendorCompany?: string;
+  vehicleNumber: string;
+  model: string;
+  category: 'Hatchback' | 'Sedan' | 'SUV' | 'Premium SUV' | 'Tempo Traveller' | 'Luxury';
+  rcDocument: string;
+  insuranceDocument?: string;
+  permitDocument?: string;
+  fitnessExpiry?: string;
+  seatingCapacity?: number;
+  fuelType?: string;
+  status: VerificationStatus;
+  rejectionReason?: string;
+  isActive: boolean;
+  addedAt: string;
+}
+
+export interface Driver {
+  id: string;
+  vendorId: string;
+  vendorName?: string;
+  vendorCompany?: string;
+  name: string;
+  phone: string;
+  licenseNumber: string;
+  dlDocument: string;
+  badgeNumber?: string;
+  experienceYears?: number;
+  assignedCabId?: string;
+  assignedCabNumber?: string;
+  status: VerificationStatus;
+  rejectionReason?: string;
+  isActive: boolean;
+  addedAt: string;
+}
+
+export interface PlatformSettings {
+  defaultCommissionPercent: number;
+  minCommissionFlat: number;
+  autoApprovalVendors: boolean;
+  autoApprovalFleet: boolean;
+  contactPhone: string;
+  contactEmail: string;
+}
 
 export interface UserProfile {
   id: string;
@@ -168,6 +219,8 @@ export interface UserProfile {
   phone: string;
   email: string;
   role: UserRole;
+  appRole?: AppRole; // 'admin' | 'vendor'
+  status: VendorAccountStatus;
   city: string;
   isVerified: boolean;
   rating: number;
@@ -176,7 +229,7 @@ export interface UserProfile {
   walletBalance: number;
   avatarUrl?: string;
   joinedDate?: string;
-  status?: 'active' | 'suspended';
+  kycDocumentUrl?: string;
 }
 
 export interface MembershipPlan {
@@ -189,3 +242,4 @@ export interface MembershipPlan {
   features: string[];
   platformFee: string;
 }
+

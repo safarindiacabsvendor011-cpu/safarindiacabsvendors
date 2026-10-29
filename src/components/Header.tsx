@@ -21,11 +21,14 @@ interface HeaderProps {
   onOpenWallet: () => void;
   onOpenPostDuty: () => void;
   onOpenMembership: () => void;
+  onOpenAuthModal: () => void;
   onUpdateRole: (role: UserRole) => void;
   activeTab: string;
   onChangeTab: (tab: string) => void;
   availableDutiesCount: number;
   returnCabsCount: number;
+  myCabsCount: number;
+  myDriversCount: number;
   unreadChatsCount?: number;
 }
 
@@ -36,14 +39,18 @@ export const Header: React.FC<HeaderProps> = ({
   onOpenWallet,
   onOpenPostDuty,
   onOpenMembership,
+  onOpenAuthModal,
   onUpdateRole,
   activeTab,
   onChangeTab,
   availableDutiesCount,
   returnCabsCount,
+  myCabsCount,
+  myDriversCount,
   unreadChatsCount = 1
 }) => {
   const [alertsEnabled, setAlertsEnabled] = useState(true);
+  const isAdmin = user.role === 'Super Admin' || user.appRole === 'admin';
 
   return (
     <header className="sticky top-0 z-40 bg-white border-b-2 border-slate-200 shadow-xs text-slate-800">
@@ -56,12 +63,12 @@ export const Header: React.FC<HeaderProps> = ({
               <span className="relative inline-flex rounded-full h-2 w-2 bg-amber-400"></span>
             </span>
             <span className="font-bold text-slate-200 tracking-wide text-[11px] sm:text-xs">
-              ⚡ Safar India Cabs B2B Network • 100% Commission Escrow & Fraud Guarantee
+              ⚡ Safar India Cabs B2B Network • Supabase RBAC Auth • Real-time Duty Exchange
             </span>
           </div>
 
-          <div className="flex items-center gap-4 text-xs">
-            {/* Alerts Toggle (as in video) */}
+          <div className="flex items-center gap-3 text-xs">
+            {/* Live Alerts Toggle */}
             <div className="flex items-center gap-2 bg-slate-900/60 px-2.5 py-0.5 rounded-full border border-slate-700">
               <span className="text-[11px] font-bold text-slate-300">Live Alerts</span>
               <button
@@ -78,6 +85,19 @@ export const Header: React.FC<HeaderProps> = ({
                 />
               </button>
             </div>
+
+            {/* Current user badge & quick auth switch */}
+            <button
+              onClick={onOpenAuthModal}
+              className="flex items-center gap-1.5 bg-white/10 hover:bg-white/20 px-2.5 py-0.5 rounded-full text-indigo-200 hover:text-white transition cursor-pointer text-[11px]"
+              title="Click to Switch Accounts or Login with Supabase"
+            >
+              <UserCheck className="w-3.5 h-3.5 text-amber-400" />
+              <span className="font-bold">{user.name.split(' ')[0]}</span>
+              <span className="text-[10px] bg-amber-400 text-slate-950 px-1 rounded font-black uppercase">
+                {isAdmin ? 'ADMIN' : 'VENDOR'}
+              </span>
+            </button>
 
             <button 
               onClick={onOpenMembership}
@@ -106,14 +126,14 @@ export const Header: React.FC<HeaderProps> = ({
                   Safar<span className="text-amber-500">India</span>Cabs
                 </span>
                 <span className="bg-amber-100 text-amber-900 border border-amber-300 text-[10px] uppercase font-black px-1.5 py-0.5 rounded">
-                  B2B Vendor
+                  B2B Transport Platform
                 </span>
                 <span title="Verified Network">
                   <ShieldCheck className="w-4 h-4 text-emerald-600" />
                 </span>
               </div>
               <p className="text-xs text-slate-500 font-bold">
-                Taxi Sanchalak B2B Exchange • Bold Leads & Return Fleet
+                Taxi Sanchalak B2B Exchange • Outstation & Intercity Marketplace
               </p>
             </div>
           </div>
@@ -179,15 +199,16 @@ export const Header: React.FC<HeaderProps> = ({
 
         {/* Navigation Tabs */}
         <nav className="flex items-center gap-1.5 mt-3 pt-2.5 border-t border-slate-100 overflow-x-auto no-scrollbar text-xs">
+          {/* Marketplace / Duty Board */}
           <button
             onClick={() => onChangeTab('duties')}
-            className={`flex items-center gap-1.5 px-4 py-1.5 rounded-xl font-black transition cursor-pointer shrink-0 ${
+            className={`flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl font-black transition cursor-pointer shrink-0 ${
               activeTab === 'duties'
                 ? 'bg-[#0a2540] text-white shadow-xs'
                 : 'text-slate-600 hover:bg-slate-100 hover:text-slate-900 font-bold'
             }`}
           >
-            <span>Duty Board</span>
+            <span>Duty Feed</span>
             <span className={`text-[10px] font-black px-2 py-0.2 rounded-full ${
               activeTab === 'duties' ? 'bg-amber-400 text-slate-950' : 'bg-slate-200 text-slate-700'
             }`}>
@@ -195,16 +216,33 @@ export const Header: React.FC<HeaderProps> = ({
             </span>
           </button>
 
+          {/* Vendor Dashboard (/dashboard) */}
+          <button
+            onClick={() => onChangeTab('dashboard')}
+            className={`flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl font-black transition cursor-pointer shrink-0 ${
+              activeTab === 'dashboard'
+                ? 'bg-[#0a2540] text-white shadow-xs'
+                : 'text-slate-600 hover:bg-slate-100 hover:text-slate-900 font-bold'
+            }`}
+          >
+            <span>Vendor Dashboard</span>
+            <span className={`text-[10px] font-black px-1.5 py-0.2 rounded-full ${
+              activeTab === 'dashboard' ? 'bg-amber-400 text-slate-950' : 'bg-blue-100 text-blue-800'
+            }`}>
+              Fleet & Drivers
+            </span>
+          </button>
+
           <button
             onClick={() => onChangeTab('return_cabs')}
-            className={`flex items-center gap-1.5 px-4 py-1.5 rounded-xl font-black transition cursor-pointer shrink-0 ${
+            className={`flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl font-black transition cursor-pointer shrink-0 ${
               activeTab === 'return_cabs'
                 ? 'bg-[#0a2540] text-white shadow-xs'
                 : 'text-slate-600 hover:bg-slate-100 hover:text-slate-900 font-bold'
             }`}
           >
-            <span>Free Vehicles / Return Cabs</span>
-            <span className={`text-[10px] font-black px-2 py-0.2 rounded-full ${
+            <span>Empty Return Cabs</span>
+            <span className={`text-[10px] font-black px-1.5 py-0.2 rounded-full ${
               activeTab === 'return_cabs' ? 'bg-amber-400 text-slate-950' : 'bg-slate-200 text-slate-700'
             }`}>
               {returnCabsCount}
@@ -213,7 +251,7 @@ export const Header: React.FC<HeaderProps> = ({
 
           <button
             onClick={() => onChangeTab('my_bookings')}
-            className={`px-4 py-1.5 rounded-xl font-black transition cursor-pointer shrink-0 ${
+            className={`px-3.5 py-1.5 rounded-xl font-black transition cursor-pointer shrink-0 ${
               activeTab === 'my_bookings'
                 ? 'bg-[#0a2540] text-white shadow-xs'
                 : 'text-slate-600 hover:bg-slate-100 hover:text-slate-900 font-bold'
@@ -224,13 +262,13 @@ export const Header: React.FC<HeaderProps> = ({
 
           <button
             onClick={() => onChangeTab('chats')}
-            className={`flex items-center gap-1.5 px-4 py-1.5 rounded-xl font-black transition cursor-pointer shrink-0 ${
+            className={`flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl font-black transition cursor-pointer shrink-0 ${
               activeTab === 'chats'
                 ? 'bg-[#0a2540] text-white shadow-xs'
                 : 'text-slate-600 hover:bg-slate-100 hover:text-slate-900 font-bold'
             }`}
           >
-            <span>Chats & Quotes</span>
+            <span>Deal Room & Chats</span>
             {unreadChatsCount > 0 && (
               <span className="bg-amber-400 text-slate-950 text-[10px] font-black px-1.5 py-0.2 rounded-full">
                 {unreadChatsCount}
@@ -240,43 +278,44 @@ export const Header: React.FC<HeaderProps> = ({
 
           <button
             onClick={() => onChangeTab('vendors')}
-            className={`px-4 py-1.5 rounded-xl font-black transition cursor-pointer shrink-0 ${
+            className={`px-3.5 py-1.5 rounded-xl font-black transition cursor-pointer shrink-0 ${
               activeTab === 'vendors'
                 ? 'bg-[#0a2540] text-white shadow-xs'
                 : 'text-slate-600 hover:bg-slate-100 hover:text-slate-900 font-bold'
             }`}
           >
-            Verified Vendors
+            Vendor Directory
           </button>
 
+          {/* Super Admin Panel (/admin) */}
           <button
             onClick={() => onChangeTab('admin')}
             className={`flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl font-black transition cursor-pointer shrink-0 border ${
               activeTab === 'admin'
-                ? 'bg-[#0a2540] text-amber-400 border-amber-400 shadow-xs'
-                : 'bg-amber-50 text-amber-900 border-amber-300 hover:bg-amber-100'
+                ? 'bg-indigo-900 text-amber-300 border-amber-400 shadow-xs'
+                : 'bg-indigo-50 text-indigo-900 border-indigo-200 hover:bg-indigo-100'
             }`}
           >
-            <span>🛡️ Super Admin</span>
+            <span>🛡️ Super Admin Panel</span>
             <span className="bg-amber-400 text-slate-950 text-[10px] font-black px-1.5 py-0.2 rounded-full">
-              Live Audit
+              /admin
             </span>
           </button>
 
           <button
             onClick={() => onChangeTab('profile')}
-            className={`px-4 py-1.5 rounded-xl font-black transition cursor-pointer shrink-0 ${
+            className={`px-3.5 py-1.5 rounded-xl font-black transition cursor-pointer shrink-0 ${
               activeTab === 'profile'
                 ? 'bg-[#0a2540] text-white shadow-xs'
                 : 'text-slate-600 hover:bg-slate-100 hover:text-slate-900 font-bold'
             }`}
           >
-            Profile & Fleet
+            Vendor Profile
           </button>
 
           <button
             onClick={onOpenMembership}
-            className={`px-4 py-1.5 rounded-xl font-black transition cursor-pointer shrink-0 ${
+            className={`px-3.5 py-1.5 rounded-xl font-black transition cursor-pointer shrink-0 ${
               activeTab === 'membership'
                 ? 'bg-amber-500 text-slate-950'
                 : 'text-amber-800 hover:bg-amber-50 hover:text-amber-900'
@@ -289,3 +328,4 @@ export const Header: React.FC<HeaderProps> = ({
     </header>
   );
 };
+

@@ -71,16 +71,17 @@ export const BottomNav: React.FC<BottomNavProps> = ({
           )}
         </button>
 
-        {/* Profile */}
+        {/* Dashboard / Fleet */}
         <button
-          onClick={() => onChangeTab('profile')}
+          onClick={() => onChangeTab('dashboard')}
           className={`flex flex-col items-center justify-center p-1 transition cursor-pointer ${
-            activeTab === 'profile' ? 'text-amber-600 font-black' : 'text-slate-400 font-bold'
+            activeTab === 'dashboard' ? 'text-amber-600 font-black' : 'text-slate-400 font-bold'
           }`}
         >
-          <User className="w-5 h-5" />
-          <span className="text-[10px] mt-0.5">Profile</span>
+          <Car className="w-5 h-5" />
+          <span className="text-[10px] mt-0.5">Fleet</span>
         </button>
+
       </div>
     </div>
   );

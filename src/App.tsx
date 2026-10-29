@@ -53,6 +53,12 @@ import {
 import {
   BookingChatModal
 } from './components/BookingChatModal';
+import {
+  VendorDashboardView
+} from './components/VendorDashboardView';
+import {
+  AuthModal
+} from './components/AuthModal';
 import { 
   Duty, 
   ReturnCab, 
@@ -60,8 +66,12 @@ import {
   WalletTransaction, 
   UserRole,
   VendorChat,
-  BookingChatMessage 
+  BookingChatMessage,
+  Cab,
+  Driver,
+  PlatformSettings
 } from './types';
+
 import { 
   loadStoredUser, 
   saveStoredUser, 
@@ -72,8 +82,15 @@ import {
   loadStoredTransactions, 
   saveStoredTransactions,
   loadStoredAllVendors,
-  saveStoredAllVendors
+  saveStoredAllVendors,
+  loadStoredCabs,
+  saveStoredCabs,
+  loadStoredDrivers,
+  saveStoredDrivers,
+  loadStoredSettings,
+  saveStoredSettings
 } from './utils/storage';
+
 import { 
   INITIAL_CHATS 
 } from './data/mockData';
@@ -90,11 +107,15 @@ export default function App() {
   const [transactions, setTransactions] = useState<WalletTransaction[]>(loadStoredTransactions);
   const [chats, setChats] = useState<VendorChat[]>(INITIAL_CHATS);
   const [allVendors, setAllVendors] = useState<UserProfile[]>(loadStoredAllVendors);
+  const [cabs, setCabs] = useState<Cab[]>(loadStoredCabs);
+  const [drivers, setDrivers] = useState<Driver[]>(loadStoredDrivers);
+  const [platformSettings, setPlatformSettings] = useState<PlatformSettings>(loadStoredSettings);
   
   const [selectedCity, setSelectedCity] = useState<string>('All Cities');
   const [activeTab, setActiveTab] = useState<string>('duties');
 
   // Modals state
+  const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
   const [isPostChoiceOpen, setIsPostChoiceOpen] = useState(false);
   const [isPostDutyOpen, setIsPostDutyOpen] = useState(false);
   const [isClaimModalOpen, setIsClaimModalOpen] = useState(false);
@@ -139,16 +160,95 @@ export default function App() {
     saveStoredAllVendors(allVendors);
   }, [allVendors]);
 
+  useEffect(() => {
+    saveStoredCabs(cabs);
+  }, [cabs]);
+
+  useEffect(() => {
+    saveStoredDrivers(drivers);
+  }, [drivers]);
+
+  useEffect(() => {
+    saveStoredSettings(platformSettings);
+  }, [platformSettings]);
+
   const handleUpdateRole = (role: UserRole) => {
-    setUser(prev => ({ ...prev, role }));
-    if (role === 'Super Admin') {
+    const isNowAdmin = role === 'Super Admin';
+    setUser(prev => ({ 
+      ...prev, 
+      role,
+      appRole: isNowAdmin ? 'admin' : 'vendor'
+    }));
+    if (isNowAdmin) {
       setActiveTab('admin');
       showToast('Switched to Super Admin Control Panel');
     } else {
-      if (activeTab === 'admin') setActiveTab('duties');
+      if (activeTab === 'admin') setActiveTab('dashboard');
       showToast(`Role switched to "${role}"`);
     }
   };
+
+  const handleLoginSuccess = (newUser: UserProfile, targetView: 'admin' | 'dashboard' | 'duties') => {
+    setUser(newUser);
+    setActiveTab(targetView);
+    showToast(`Signed in successfully as ${newUser.name} (${newUser.role})`);
+  };
+
+  // Cab management handlers
+  const handleAddCab = (newCab: Cab) => {
+    setCabs(prev => [newCab, ...prev]);
+    showToast(`Vehicle ${newCab.vehicleNumber} submitted for Super Admin verification.`);
+  };
+
+  const handleDeleteCab = (cabId: string) => {
+    setCabs(prev => prev.filter(c => c.id !== cabId));
+    showToast('Vehicle removed from your fleet.');
+  };
+
+  const handleUpdateCab = (updatedCab: Cab) => {
+    setCabs(prev => prev.map(c => c.id === updatedCab.id ? updatedCab : c));
+  };
+
+  const handleApproveCab = (cabId: string) => {
+    setCabs(prev => prev.map(c => c.id === cabId ? { ...c, status: 'approved', rejectionReason: undefined } : c));
+    showToast('Vehicle approved and verified for bookings!');
+  };
+
+  const handleRejectCab = (cabId: string, reason: string) => {
+    setCabs(prev => prev.map(c => c.id === cabId ? { ...c, status: 'rejected', rejectionReason: reason } : c));
+    showToast(`Vehicle verification rejected with feedback note.`);
+  };
+
+  // Driver management handlers
+  const handleAddDriver = (newDriver: Driver) => {
+    setDrivers(prev => [newDriver, ...prev]);
+    showToast(`Driver ${newDriver.name} submitted for DL verification.`);
+  };
+
+  const handleDeleteDriver = (driverId: string) => {
+    setDrivers(prev => prev.filter(d => d.id !== driverId));
+    showToast('Driver removed from roster.');
+  };
+
+  const handleUpdateDriver = (updatedDriver: Driver) => {
+    setDrivers(prev => prev.map(d => d.id === updatedDriver.id ? updatedDriver : d));
+  };
+
+  const handleApproveDriver = (driverId: string) => {
+    setDrivers(prev => prev.map(d => d.id === driverId ? { ...d, status: 'approved', rejectionReason: undefined } : d));
+    showToast('Driver DL verified and approved!');
+  };
+
+  const handleRejectDriver = (driverId: string, reason: string) => {
+    setDrivers(prev => prev.map(d => d.id === driverId ? { ...d, status: 'rejected', rejectionReason: reason } : d));
+    showToast('Driver verification rejected with feedback note.');
+  };
+
+  const handleUpdateSettings = (newSettings: PlatformSettings) => {
+    setPlatformSettings(newSettings);
+    showToast('Platform commission settings updated.');
+  };
+
 
   // Add new duty
   const handleAddDuty = (newDuty: Duty) => {
@@ -399,13 +499,14 @@ export default function App() {
   const handleToggleVendorStatus = (vendorId: string) => {
     setAllVendors(prev => prev.map(v => {
       if (v.id === vendorId) {
-        const nextStatus = v.status === 'suspended' ? 'active' : 'suspended';
+        const nextStatus = v.status === 'suspended' ? 'approved' : 'suspended';
         return { ...v, status: nextStatus };
       }
       return v;
     }));
     showToast('Vendor account status updated');
   };
+
 
   const handleAdjustVendorWallet = (vendorId: string, deltaAmount: number, reason: string) => {
     setAllVendors(prev => prev.map(v => {
@@ -497,11 +598,14 @@ export default function App() {
         onOpenWallet={() => setIsWalletOpen(true)}
         onOpenPostDuty={() => setIsPostDutyOpen(true)}
         onOpenMembership={() => setIsMembershipOpen(true)}
+        onOpenAuthModal={() => setIsAuthModalOpen(true)}
         onUpdateRole={handleUpdateRole}
         activeTab={activeTab}
         onChangeTab={setActiveTab}
         availableDutiesCount={availableDutiesCount}
         returnCabsCount={returnCabs.length}
+        myCabsCount={cabs.filter(c => c.vendorId === user.id).length}
+        myDriversCount={drivers.filter(d => d.vendorId === user.id).length}
         unreadChatsCount={1}
       />
 
@@ -512,6 +616,7 @@ export default function App() {
 
       {/* Main Container */}
       <main className="flex-1 max-w-7xl w-full mx-auto px-4 py-6">
+        {/* Marketplace Duty Board */}
         {activeTab === 'duties' && (
           <DutyBoard
             duties={duties}
@@ -525,20 +630,54 @@ export default function App() {
           />
         )}
 
+        {/* Vendor Dashboard (/dashboard) */}
+        {activeTab === 'dashboard' && (
+          <VendorDashboardView
+            currentUser={user}
+            cabs={cabs}
+            drivers={drivers}
+            duties={duties}
+            transactions={transactions}
+            onAddCab={handleAddCab}
+            onDeleteCab={handleDeleteCab}
+            onUpdateCab={handleUpdateCab}
+            onAddDriver={handleAddDriver}
+            onDeleteDriver={handleDeleteDriver}
+            onUpdateDriver={handleUpdateDriver}
+            onOpenPostDuty={() => setIsPostDutyOpen(true)}
+            onOpenWallet={() => setIsWalletOpen(true)}
+            onOpenMembership={() => setIsMembershipOpen(true)}
+            onViewSlip={handleViewSlip}
+            onOpenChat={handleOpenChat}
+          />
+        )}
+
+        {/* Super Admin Panel (/admin) */}
         {activeTab === 'admin' && (
           <AdminPanel
+            currentUser={user}
             duties={duties}
             vendors={allVendors}
+            cabs={cabs}
+            drivers={drivers}
             transactions={transactions}
+            platformSettings={platformSettings}
             onUpdateDutyStatus={handleUpdateDutyStatus}
             onRefundCommission={handleRefundCommission}
             onToggleVendorKyc={handleToggleVendorKyc}
             onToggleVendorStatus={handleToggleVendorStatus}
             onAdjustVendorWallet={handleAdjustVendorWallet}
+            onApproveCab={handleApproveCab}
+            onRejectCab={handleRejectCab}
+            onApproveDriver={handleApproveDriver}
+            onRejectDriver={handleRejectDriver}
+            onUpdateSettings={handleUpdateSettings}
             onViewSlip={handleViewSlip}
-            onSwitchToVendorView={() => setActiveTab('duties')}
+            onSwitchToVendorView={() => setActiveTab('dashboard')}
+            onOpenAuthModal={() => setIsAuthModalOpen(true)}
           />
         )}
+
 
         {activeTab === 'return_cabs' && (
           <KhaliGadiBoard
@@ -719,6 +858,14 @@ export default function App() {
         onAddFunds={handleAddFunds}
       />
 
+      {/* Auth Modal */}
+      <AuthModal
+        isOpen={isAuthModalOpen}
+        onClose={() => setIsAuthModalOpen(false)}
+        currentUser={user}
+        onLoginSuccess={handleLoginSuccess}
+      />
+
       {activeTab !== 'membership' && (
         <MembershipModal
           isOpen={isMembershipOpen}
@@ -727,6 +874,7 @@ export default function App() {
           onUpgradePlan={handleUpgradePlan}
         />
       )}
+
     </div>
   );
 }

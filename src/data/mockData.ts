@@ -1,4 +1,4 @@
-import { Duty, ReturnCab, UserProfile, MembershipPlan, WalletTransaction, VendorChat } from '../types';
+import { Duty, ReturnCab, UserProfile, MembershipPlan, WalletTransaction, VendorChat, Cab, Driver, PlatformSettings } from '../types';
 
 export const CITIES_LIST = [
   'All Cities',
@@ -27,6 +27,7 @@ export const INITIAL_USER: UserProfile = {
   phone: '+91 85060 46346',
   email: 'safarindiacabsvendor011@gmail.com',
   role: 'Travel Agent',
+  appRole: 'vendor',
   city: 'Delhi NCR',
   isVerified: true,
   rating: 4.8,
@@ -35,8 +36,10 @@ export const INITIAL_USER: UserProfile = {
   walletBalance: 2450,
   avatarUrl: '/assets/aistudio/IMG-20261029-WA0001_67f0d119.jpg',
   joinedDate: '15 Jan 2026',
-  status: 'active'
+  status: 'approved',
+  kycDocumentUrl: 'https://images.unsplash.com/photo-1554224155-8d04cb21cd6c?w=600&auto=format&fit=crop&q=80'
 };
+
 
 export const INITIAL_DUTIES: Duty[] = [
   {
@@ -562,9 +565,11 @@ export const VERIFIED_VENDORS: UserProfile[] = [
     membershipPlan: 'Gold',
     walletBalance: 2450,
     isVerified: true,
-    status: 'active',
-    joinedDate: '15 Jan 2026'
+    status: 'approved',
+    joinedDate: '15 Jan 2026',
+    kycDocumentUrl: 'https://images.unsplash.com/photo-1554224155-8d04cb21cd6c?w=600&auto=format&fit=crop&q=80'
   },
+
   {
     id: 'agt-112',
     name: 'Balwinder Sandhu',
@@ -578,8 +583,9 @@ export const VERIFIED_VENDORS: UserProfile[] = [
     membershipPlan: 'Silver',
     walletBalance: 1200,
     isVerified: true,
-    status: 'active',
-    joinedDate: '02 Feb 2026'
+    status: 'approved',
+    joinedDate: '02 Feb 2026',
+    kycDocumentUrl: 'https://images.unsplash.com/photo-1554224155-8d04cb21cd6c?w=600&auto=format&fit=crop&q=80'
   },
   {
     id: 'agt-204',
@@ -594,8 +600,9 @@ export const VERIFIED_VENDORS: UserProfile[] = [
     membershipPlan: 'Gold',
     walletBalance: 3100,
     isVerified: true,
-    status: 'active',
-    joinedDate: '10 Feb 2026'
+    status: 'approved',
+    joinedDate: '10 Feb 2026',
+    kycDocumentUrl: 'https://images.unsplash.com/photo-1554224155-8d04cb21cd6c?w=600&auto=format&fit=crop&q=80'
   },
   {
     id: 'usr-driver-88',
@@ -610,8 +617,9 @@ export const VERIFIED_VENDORS: UserProfile[] = [
     membershipPlan: 'Gold',
     walletBalance: 4500,
     isVerified: true,
-    status: 'active',
-    joinedDate: '18 Dec 2025'
+    status: 'approved',
+    joinedDate: '18 Dec 2025',
+    kycDocumentUrl: 'https://images.unsplash.com/photo-1554224155-8d04cb21cd6c?w=600&auto=format&fit=crop&q=80'
   },
   {
     id: 'agt-501',
@@ -626,10 +634,142 @@ export const VERIFIED_VENDORS: UserProfile[] = [
     membershipPlan: 'Diamond',
     walletBalance: 8200,
     isVerified: true,
-    status: 'active',
-    joinedDate: '05 Nov 2025'
+    status: 'approved',
+    joinedDate: '05 Nov 2025',
+    kycDocumentUrl: 'https://images.unsplash.com/photo-1554224155-8d04cb21cd6c?w=600&auto=format&fit=crop&q=80'
   }
 ];
+
+// Initial Cabs / Fleet
+export const INITIAL_CABS: Cab[] = [
+  {
+    id: 'cab-001',
+    vendorId: 'usr-safar-001',
+    vendorName: 'SafarIndiaCabs',
+    vendorCompany: 'Safar India Cabs & Fleet',
+    vehicleNumber: 'DL 01 TA 4421',
+    model: 'Maruti Suzuki Dzire VXI',
+    category: 'Sedan',
+    rcDocument: 'https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?w=800&auto=format&fit=crop&q=80',
+    insuranceDocument: 'https://images.unsplash.com/photo-1589829545856-d10d557cf95f?w=800&auto=format&fit=crop&q=80',
+    fitnessExpiry: '2027-08-15',
+    seatingCapacity: 4,
+    fuelType: 'CNG + Petrol',
+    status: 'approved',
+    isActive: true,
+    addedAt: '12 Feb 2026'
+  },
+  {
+    id: 'cab-002',
+    vendorId: 'usr-safar-001',
+    vendorName: 'SafarIndiaCabs',
+    vendorCompany: 'Safar India Cabs & Fleet',
+    vehicleNumber: 'HR 26 BR 9081',
+    model: 'Toyota Innova Crysta 2.4 VX',
+    category: 'Premium SUV',
+    rcDocument: 'https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?w=800&auto=format&fit=crop&q=80',
+    insuranceDocument: 'https://images.unsplash.com/photo-1589829545856-d10d557cf95f?w=800&auto=format&fit=crop&q=80',
+    fitnessExpiry: '2028-02-10',
+    seatingCapacity: 7,
+    fuelType: 'Diesel',
+    status: 'approved',
+    isActive: true,
+    addedAt: '18 Feb 2026'
+  },
+  {
+    id: 'cab-003',
+    vendorId: 'usr-safar-001',
+    vendorName: 'SafarIndiaCabs',
+    vendorCompany: 'Safar India Cabs & Fleet',
+    vehicleNumber: 'UP 16 Z 8820',
+    model: 'Maruti Suzuki Ertiga VXI',
+    category: 'SUV',
+    rcDocument: 'https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?w=800&auto=format&fit=crop&q=80',
+    insuranceDocument: 'https://images.unsplash.com/photo-1589829545856-d10d557cf95f?w=800&auto=format&fit=crop&q=80',
+    fitnessExpiry: '2027-11-20',
+    seatingCapacity: 6,
+    fuelType: 'CNG',
+    status: 'pending',
+    isActive: true,
+    addedAt: 'Yesterday'
+  },
+  {
+    id: 'cab-004',
+    vendorId: 'agt-112',
+    vendorName: 'Balwinder Sandhu',
+    vendorCompany: 'Sandhu Tour & Travels',
+    vehicleNumber: 'PB 11 CD 3410',
+    model: 'Maruti WagonR 1.2',
+    category: 'Hatchback',
+    rcDocument: 'https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?w=800&auto=format&fit=crop&q=80',
+    fitnessExpiry: '2026-12-30',
+    seatingCapacity: 4,
+    fuelType: 'Petrol',
+    status: 'approved',
+    isActive: true,
+    addedAt: '10 Feb 2026'
+  }
+];
+
+// Initial Drivers
+export const INITIAL_DRIVERS: Driver[] = [
+  {
+    id: 'drv-001',
+    vendorId: 'usr-safar-001',
+    vendorName: 'SafarIndiaCabs',
+    vendorCompany: 'Safar India Cabs & Fleet',
+    name: 'Ramesh Kumar',
+    phone: '+91 98112 34567',
+    licenseNumber: 'DL-0420180029381',
+    dlDocument: 'https://images.unsplash.com/photo-1589829545856-d10d557cf95f?w=800&auto=format&fit=crop&q=80',
+    experienceYears: 8,
+    assignedCabId: 'cab-001',
+    assignedCabNumber: 'DL 01 TA 4421',
+    status: 'approved',
+    isActive: true,
+    addedAt: '12 Feb 2026'
+  },
+  {
+    id: 'drv-002',
+    vendorId: 'usr-safar-001',
+    vendorName: 'SafarIndiaCabs',
+    vendorCompany: 'Safar India Cabs & Fleet',
+    name: 'Gurpreet Singh',
+    phone: '+91 98188 77665',
+    licenseNumber: 'HR-2620190048123',
+    dlDocument: 'https://images.unsplash.com/photo-1589829545856-d10d557cf95f?w=800&auto=format&fit=crop&q=80',
+    experienceYears: 11,
+    assignedCabId: 'cab-002',
+    assignedCabNumber: 'HR 26 BR 9081',
+    status: 'approved',
+    isActive: true,
+    addedAt: '18 Feb 2026'
+  },
+  {
+    id: 'drv-003',
+    vendorId: 'usr-safar-001',
+    vendorName: 'SafarIndiaCabs',
+    vendorCompany: 'Safar India Cabs & Fleet',
+    name: 'Anil Sharma',
+    phone: '+91 99280 44332',
+    licenseNumber: 'UP-1620210088991',
+    dlDocument: 'https://images.unsplash.com/photo-1589829545856-d10d557cf95f?w=800&auto=format&fit=crop&q=80',
+    experienceYears: 4,
+    status: 'pending',
+    isActive: true,
+    addedAt: 'Today'
+  }
+];
+
+// Platform Settings
+export const INITIAL_PLATFORM_SETTINGS: PlatformSettings = {
+  defaultCommissionPercent: 10,
+  minCommissionFlat: 150,
+  autoApprovalVendors: false,
+  autoApprovalFleet: false,
+  contactPhone: '+91 85060 46346',
+  contactEmail: 'admin@safarindiacabs.com'
+};
 
 // Helper to generate next sequential booking number starting from SIC2601
 export const getNextBookingNumber = (existingDuties: Duty[]): string => {
@@ -644,3 +784,4 @@ export const getNextBookingNumber = (existingDuties: Duty[]): string => {
   });
   return `SIC${highestNum + 1}`;
 };
+

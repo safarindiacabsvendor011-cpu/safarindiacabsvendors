@@ -1,12 +1,15 @@
-import { Duty, ReturnCab, UserProfile, WalletTransaction } from '../types';
-import { INITIAL_USER, INITIAL_DUTIES, INITIAL_RETURN_CABS, INITIAL_TRANSACTIONS, VERIFIED_VENDORS } from '../data/mockData';
+import { Duty, ReturnCab, UserProfile, WalletTransaction, Cab, Driver, PlatformSettings } from '../types';
+import { INITIAL_USER, INITIAL_DUTIES, INITIAL_RETURN_CABS, INITIAL_TRANSACTIONS, VERIFIED_VENDORS, INITIAL_CABS, INITIAL_DRIVERS, INITIAL_PLATFORM_SETTINGS } from '../data/mockData';
 
 const KEYS = {
-  USER: 'sic_vendor_user_v3',
-  DUTIES: 'sic_vendor_duties_v3',
-  RETURN_CABS: 'sic_vendor_return_cabs_v3',
-  TRANSACTIONS: 'sic_vendor_transactions_v3',
-  ALL_VENDORS: 'sic_all_registered_vendors_v3'
+  USER: 'sic_vendor_user_v4',
+  DUTIES: 'sic_vendor_duties_v4',
+  RETURN_CABS: 'sic_vendor_return_cabs_v4',
+  TRANSACTIONS: 'sic_vendor_transactions_v4',
+  ALL_VENDORS: 'sic_all_registered_vendors_v4',
+  CABS: 'sic_all_cabs_v4',
+  DRIVERS: 'sic_all_drivers_v4',
+  SETTINGS: 'sic_platform_settings_v4'
 };
 
 export const loadStoredUser = (): UserProfile => {
@@ -84,6 +87,57 @@ export const saveStoredAllVendors = (vendors: UserProfile[]) => {
   }
 };
 
+export const loadStoredCabs = (): Cab[] => {
+  try {
+    const raw = localStorage.getItem(KEYS.CABS);
+    return raw ? JSON.parse(raw) : INITIAL_CABS;
+  } catch {
+    return INITIAL_CABS;
+  }
+};
+
+export const saveStoredCabs = (cabs: Cab[]) => {
+  try {
+    localStorage.setItem(KEYS.CABS, JSON.stringify(cabs));
+  } catch (e) {
+    console.error('Failed to save cabs', e);
+  }
+};
+
+export const loadStoredDrivers = (): Driver[] => {
+  try {
+    const raw = localStorage.getItem(KEYS.DRIVERS);
+    return raw ? JSON.parse(raw) : INITIAL_DRIVERS;
+  } catch {
+    return INITIAL_DRIVERS;
+  }
+};
+
+export const saveStoredDrivers = (drivers: Driver[]) => {
+  try {
+    localStorage.setItem(KEYS.DRIVERS, JSON.stringify(drivers));
+  } catch (e) {
+    console.error('Failed to save drivers', e);
+  }
+};
+
+export const loadStoredSettings = (): PlatformSettings => {
+  try {
+    const raw = localStorage.getItem(KEYS.SETTINGS);
+    return raw ? JSON.parse(raw) : INITIAL_PLATFORM_SETTINGS;
+  } catch {
+    return INITIAL_PLATFORM_SETTINGS;
+  }
+};
+
+export const saveStoredSettings = (settings: PlatformSettings) => {
+  try {
+    localStorage.setItem(KEYS.SETTINGS, JSON.stringify(settings));
+  } catch (e) {
+    console.error('Failed to save settings', e);
+  }
+};
+
 export const loadStoredReturnCabs = (): ReturnCab[] => {
   try {
     const raw = localStorage.getItem(KEYS.RETURN_CABS);
@@ -117,3 +171,4 @@ export const saveStoredTransactions = (transactions: WalletTransaction[]) => {
     console.error('Failed to save transactions', e);
   }
 };
+
